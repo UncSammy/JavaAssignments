@@ -1,4 +1,3 @@
-
 public class Car {
 
     private double gasolineTankCapacity;
@@ -35,6 +34,16 @@ public class Car {
         return speed;
     }
 
+    // Set current speed (available to subclasses)
+    protected void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    // Get gasoline consumption
+    public double getGasolineConsumption() {
+        return 6.0;
+    }
+
     // Turn cruise control on
     public boolean turnOnCruiseControl() {
 
@@ -50,7 +59,7 @@ public class Car {
     }
 
     // Accelerate or decelerate to target speed
-    private void adjustSpeed() {
+    protected void adjustSpeed() {
 
         while (speed < targetSpeed) {
             speed++;
