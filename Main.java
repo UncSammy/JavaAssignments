@@ -1,61 +1,191 @@
-import model.Book;
-import model.LibraryMember;
-import system.Library;
 
+import java.io.*;
+
+// Student class
+class Student implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private int id;
+    private String name;
+    private int age;
+
+    public Student(int id, String name, int age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+
+// Course class
+class Course implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String courseCode;
+    private String courseName;
+    private String instructor;
+
+    public Course(String courseCode, String courseName, String instructor) {
+        this.courseCode = courseCode;
+        this.courseName = courseName;
+        this.instructor = instructor;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public String getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(String instructor) {
+        this.instructor = instructor;
+    }
+}
+
+// Enrollment class
+class Enrollment implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Student student;
+    private Course course;
+    private String enrollmentDate;
+
+    public Enrollment(Student student, Course course, String enrollmentDate) {
+        this.student = student;
+        this.course = course;
+        this.enrollmentDate = enrollmentDate;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public String getEnrollmentDate() {
+        return enrollmentDate;
+    }
+
+    public void setEnrollmentDate(String enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
+}
+
+// Main class
 public class Main {
 
     public static void main(String[] args) {
 
-        Library library = new Library();
+        Student student = new Student(1, "Khalid", 24);
 
-        // Create books
-        Book book1 = new Book("Harry Potter", "J.K. Rowling", "1111");
-        Book book2 = new Book("The Hobbit", "J.R.R. Tolkien", "2222");
-        Book book3 = new Book("Clean Code", "Robert C. Martin", "3333");
+        Course course = new Course(
+                "ICT101",
+                "Java Programming",
+                "Teacher"
+        );
 
-        // Create library members
-        LibraryMember member1 = new LibraryMember("Ahmed", 101);
-        LibraryMember member2 = new LibraryMember("Ali", 102);
+        Enrollment enrollment = new Enrollment(
+                student,
+                course,
+                "10.11.2026"
+        );
 
-        // Add books and members
-        library.addBook(book1);
-        library.addBook(book2);
-        library.addBook(book3);
+        // Serialization
+        try (ObjectOutputStream output =
+                     new ObjectOutputStream(
+                             new FileOutputStream("enrollments.ser"))) {
 
-        library.addMember(member1);
-        library.addMember(member2);
+            output.writeObject(enrollment);
 
-        System.out.println("\n--- Borrowing Books ---");
+            System.out.println("Enrollment saved successfully.");
 
-        library.borrowBook(member1, book1);
-        library.borrowBook(member2, book2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        System.out.println("\n--- Returning Books ---");
+        // Deserialization
+        try (ObjectInputStream input =
+                     new ObjectInputStream(
+                             new FileInputStream("enrollments.ser"))) {
 
-        library.returnBook(member1, book1);
+            Enrollment savedEnrollment =
+                    (Enrollment) input.readObject();
 
-        System.out.println("\n--- Reserving Books ---");
+            System.out.println("\nEnrollment information:");
 
-        library.reserveBook(member1, book1);
-        library.reserveBook(member2, book3);
+            System.out.println("Student ID: "
+                    + savedEnrollment.getStudent().getId());
 
-        System.out.println("\n--- Displaying Reserved Books ---");
+            System.out.println("Student Name: "
+                    + savedEnrollment.getStudent().getName());
 
-        library.displayReservedBooks(member1);
-        library.displayReservedBooks(member2);
+            System.out.println("Student Age: "
+                    + savedEnrollment.getStudent().getAge());
 
-        System.out.println("\n--- Testing Reserved Book ---");
+            System.out.println("Course Code: "
+                    + savedEnrollment.getCourse().getCourseCode());
 
-        library.borrowBook(member2, book1);
+            System.out.println("Course Name: "
+                    + savedEnrollment.getCourse().getCourseName());
 
-        System.out.println("\n--- Canceling Reservation ---");
+            System.out.println("Instructor: "
+                    + savedEnrollment.getCourse().getInstructor());
 
-        library.cancelReservation(member1, book1);
+            System.out.println("Enrollment Date: "
+                    + savedEnrollment.getEnrollmentDate());
 
-        System.out.println("\n--- Reserved Books After Cancellation ---");
-
-        library.displayReservedBooks(member1);
-
-        System.out.println("\n--- Library System Test Complete ---");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
