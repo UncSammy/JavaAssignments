@@ -42,7 +42,7 @@ public class OrientationTask1_4 {
                         Customer removedCustomer = queue.removeLast();
                         removedCustomer.setEndTime(System.nanoTime());
 
-                        long timeSpent = removedCustomer.getTimeSpent();
+                        double timeSpent = removedCustomer.getTimeSpent();
 
                         System.out.println("Customer "
                                 + removedCustomer.getId()

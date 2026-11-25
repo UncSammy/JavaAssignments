@@ -6,7 +6,7 @@ import java.util.LinkedList;
 public class ServicePoint {
 
     private LinkedList<Customer> queue;
-    private long totalServiceTime;
+    private double totalServiceTime;
     private int customersServed;
 
     public ServicePoint() {
@@ -27,45 +27,33 @@ public class ServicePoint {
         return queue.removeLast();
     }
 
-    public void serve() {
+    // Serve customers using the simulation clock
+    public void serve(Clock clock, double serviceTime) {
 
         while (!queue.isEmpty()) {
 
             Customer customer = removeFromQueueue();
 
-            long serviceStartTime = System.nanoTime();
+            double serviceStartTime = clock.getTime();
+            double serviceEndTime = serviceStartTime + serviceTime;
 
-            long serviceTime = (long) (Math.random() * 2000) + 1000;
-
-            try {
-                Thread.sleep(serviceTime);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("Service was interrupted.");
-                return;
-            }
-
-            long serviceEndTime = System.nanoTime();
-
+            clock.setTime(serviceEndTime);
             customer.setEndTime(serviceEndTime);
 
-            long responseTime =
-                    customer.getEndTime() - customer.getStartTime();
+            double responseTime = customer.getTimeSpent();
 
-            long actualServiceTime =
-                    serviceEndTime - serviceStartTime;
-
-            totalServiceTime += actualServiceTime;
+            totalServiceTime += serviceTime;
             customersServed++;
 
             System.out.println("\nCustomer ID: " + customer.getId());
-
-            System.out.println("Response time: "
-                    + responseTime / 1_000_000.0 + " ms");
-
-            System.out.println("Service time: "
-                    + actualServiceTime / 1_000_000.0 + " ms");
+            System.out.println("Response time: " + responseTime);
+            System.out.println("Service time: " + serviceTime);
         }
+    }
+
+    // Compatibility with older tests
+    public void serve() {
+        serve(Clock.getInstance(), 2.0);
     }
 
     public double getAverageServiceTime() {
@@ -74,6 +62,6 @@ public class ServicePoint {
             return 0;
         }
 
-        return (double) totalServiceTime / customersServed;
+        return totalServiceTime / customersServed;
     }
 }
